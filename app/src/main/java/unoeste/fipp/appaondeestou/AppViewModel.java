@@ -39,8 +39,8 @@ public class AppViewModel extends ViewModel {
     public LiveData<String> getErroGeocodificacao() { return erroGeocodificacao; }
 
     public void setResultados(List<Endereco> lista, String descricao) {
+        descricaoBusca.setValue(descricao); // antes da lista: o observer da lista lê a descrição
         resultados.setValue(lista);
-        descricaoBusca.setValue(descricao);
     }
 
     public void setLocalizacaoAtual(GeoPoint ponto) {
