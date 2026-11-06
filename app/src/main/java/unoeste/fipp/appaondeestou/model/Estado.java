@@ -1,0 +1,17 @@
+package unoeste.fipp.appaondeestou.model;
+
+/** UF retornada pela API de localidades do IBGE. */
+public class Estado {
+    private int id;
+    private String sigla;
+    private String nome;
+
+    public int getId() { return id; }
+    public String getSigla() { return sigla; }
+    public String getNome() { return nome; }
+
+    @Override
+    public String toString() {
+        return sigla + " - " + nome;
+    }
+}

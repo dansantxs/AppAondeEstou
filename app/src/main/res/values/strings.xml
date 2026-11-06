@@ -1,5 +1,43 @@
 <resources>
-    <string name="app_name">AppAondeEstou</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_name">Aonde Fica?</string>
+
+    <string name="nav_busca">Buscar</string>
+    <string name="nav_resultados">Resultados</string>
+    <string name="nav_mapa">Mapa</string>
+
+    <!-- Busca -->
+    <string name="titulo_busca">Encontre um local</string>
+    <string name="subtitulo_busca">Escolha a UF e a cidade e informe parte do nome de uma rua, avenida, praça ou estabelecimento.</string>
+    <string name="label_uf">UF</string>
+    <string name="label_cidade">Cidade</string>
+    <string name="hint_referencia">Referência (ex.: Avenida Brasil)</string>
+    <string name="bt_buscar">Buscar</string>
+    <string name="carregando_ufs">Carregando UFs…</string>
+    <string name="carregando_cidades">Carregando cidades de %1$s…</string>
+    <string name="buscando">Buscando…</string>
+    <string name="erro_referencia">Informe ao menos 3 caracteres</string>
+    <string name="erro_ibge">Não foi possível carregar os dados do IBGE.</string>
+    <string name="erro_viacep">O ViaCEP não aceitou a pesquisa. Revise a referência.</string>
+    <string name="erro_conexao">Falha de conexão: %1$s</string>
+    <string name="nenhum_resultado">Nenhum resultado para %1$s.</string>
+    <plurals name="qtd_resultados">
+        <item quantity="one">%1$d resultado encontrado.</item>
+        <item quantity="other">%1$d resultados encontrados.</item>
+    </plurals>
+
+    <!-- Resultados -->
+    <plurals name="resumo_resultados">
+        <item quantity="one">%1$d resultado para %2$s</item>
+        <item quantity="other">%1$d resultados para %2$s</item>
+    </plurals>
+    <string name="sem_resultados">Nenhuma pesquisa ainda.\nUse a aba Buscar.</string>
+    <string name="cep_formato">CEP %1$s</string>
+
+    <!-- Mapa -->
+    <string name="selecione_resultado">Selecione um resultado na aba Resultados</string>
+    <string name="voce_esta_aqui">Você está aqui</string>
+    <string name="aguardando_gps">Sua posição: aguardando GPS…</string>
+    <string name="coord_atual">Sua posição: %1$s</string>
+    <string name="coord_destino">Local: %1$s</string>
+    <string name="distancia">Distância em linha reta: %1$s</string>
 </resources>

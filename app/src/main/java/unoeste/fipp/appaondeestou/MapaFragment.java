@@ -1,54 +1,204 @@
 package unoeste.fipp.appaondeestou;
 
+import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import org.osmdroid.api.IMapController;
-import org.osmdroid.config.Configuration;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
 
+import java.util.Arrays;
+import java.util.Locale;
+
+import unoeste.fipp.appaondeestou.model.Endereco;
+
+/** Fragment 3: posição atual, posição do endereço e distância em linha reta. */
 public class MapaFragment extends Fragment {
+    // centro usado enquanto não há nenhuma posição (Presidente Prudente/SP)
+    private static final GeoPoint CENTRO_PADRAO = new GeoPoint(-22.1256, -51.3889);
+
     private MapView mapView;
+    private Marker markerAtual, markerDestino;
+    private Polyline linha;
+    private TextView tvTitulo, tvDetalhes, tvCoordDestino, tvCoordAtual, tvDistancia, tvStatus;
+    private ProgressBar pbGeocodificando;
+
+    private AppViewModel viewModel;
+    // o que já foi enquadrado: 0 nada, 1 só atual, 2 só destino, 3 ambos
+    private int enquadrado = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_mapa, container, false);
         mapView = view.findViewById(R.id.mapaId);
+        tvTitulo = view.findViewById(R.id.tvTitulo);
+        tvDetalhes = view.findViewById(R.id.tvDetalhes);
+        tvCoordDestino = view.findViewById(R.id.tvCoordDestino);
+        tvCoordAtual = view.findViewById(R.id.tvCoordAtual);
+        tvDistancia = view.findViewById(R.id.tvDistancia);
+        tvStatus = view.findViewById(R.id.tvStatus);
+        pbGeocodificando = view.findViewById(R.id.pbGeocodificando);
+
         mapView.setTileSource(TileSourceFactory.MAPNIK);
-        // necessário para API superior à 13
-        Configuration.getInstance().load(view.getContext(), PreferenceManager.getDefaultSharedPreferences(view.getContext()));
-        //Cria um ponto de referência com base na latitude e longitude
-        //GeoPoint pontoInicial = new GeoPoint(-22.132828, -51.402655);
-        IMapController mapController = mapView.getController();
-        //Faz zoom no mapa
-        mapController.setZoom(15.0);
-        //Centraliza o mapa no ponto de referência
-        GeoPoint posicaoAtual=((MainActivity)getActivity()).getGeoPoint();
-        mapController.setCenter(posicaoAtual);
-        //Cria um marcador no mapa
-        Marker startMarker = new Marker(mapView);
-        startMarker.setPosition(posicaoAtual);
-        startMarker.setTitle("Ponto Atual");
-        //Posição do ícone
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        mapView.getOverlays().add(startMarker);
+        mapView.setMultiTouchControls(true);
+        mapView.getController().setZoom(14.0);
+        mapView.getController().setCenter(CENTRO_PADRAO);
+
+        markerAtual = new Marker(mapView);
+        markerAtual.setTitle(getString(R.string.voce_esta_aqui));
+        markerAtual.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.ic_posicao_atual));
+        markerAtual.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
+
+        markerDestino = new Marker(mapView);
+        markerDestino.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+
+        linha = new Polyline(mapView);
+        linha.getOutlinePaint().setColor(Color.parseColor("#D32F2F"));
+        linha.getOutlinePaint().setStrokeWidth(8f);
+
+        viewModel = new ViewModelProvider(requireActivity()).get(AppViewModel.class);
+        viewModel.getSelecionado().observe(getViewLifecycleOwner(), e -> {
+            enquadrado = 0;
+            mostrarEndereco(e);
+            atualizar();
+        });
+        viewModel.getDestino().observe(getViewLifecycleOwner(), p -> {
+            enquadrado = 0;
+            atualizar();
+        });
+        viewModel.getLocalizacaoAtual().observe(getViewLifecycleOwner(), p -> atualizar());
+        viewModel.getGeocodificando().observe(getViewLifecycleOwner(), sim ->
+                pbGeocodificando.setVisibility(Boolean.TRUE.equals(sim) ? View.VISIBLE : View.GONE));
+        viewModel.getErroGeocodificacao().observe(getViewLifecycleOwner(), erro -> {
+            tvStatus.setVisibility(erro == null ? View.GONE : View.VISIBLE);
+            tvStatus.setText(erro);
+        });
         return view;
+    }
+
+    private void mostrarEndereco(Endereco e) {
+        if (e == null) {
+            tvTitulo.setText(R.string.selecione_resultado);
+            tvDetalhes.setVisibility(View.GONE);
+            return;
+        }
+        tvTitulo.setText(e.getLogradouro());
+        StringBuilder sb = new StringBuilder();
+        if (e.temComplemento()) sb.append(e.getComplemento()).append('\n');
+        if (e.getBairro() != null && !e.getBairro().isEmpty()) sb.append(e.getBairro()).append(" · ");
+        sb.append(e.getCidadeUf()).append('\n');
+        sb.append(getString(R.string.cep_formato, e.getCep()));
+        if (e.getDdd() != null && !e.getDdd().isEmpty()) sb.append("  ·  DDD ").append(e.getDdd());
+        tvDetalhes.setText(sb.toString());
+        tvDetalhes.setVisibility(View.VISIBLE);
+        markerDestino.setTitle(e.getLogradouro());
+        markerDestino.setSnippet(e.getEnderecoCompleto() + " - CEP " + e.getCep());
+    }
+
+    /** Reposiciona marcadores, linha e recalcula a distância. */
+    private void atualizar() {
+        GeoPoint atual = viewModel.getLocalizacaoAtual().getValue();
+        GeoPoint destino = viewModel.getDestino().getValue();
+
+        mapView.getOverlays().clear();
+        if (atual != null) {
+            markerAtual.setPosition(atual);
+            mapView.getOverlays().add(markerAtual);
+            tvCoordAtual.setText(getString(R.string.coord_atual, formatar(atual)));
+        } else {
+            tvCoordAtual.setText(R.string.aguardando_gps);
+        }
+
+        if (destino != null) {
+            markerDestino.setPosition(destino);
+            mapView.getOverlays().add(markerDestino);
+            tvCoordDestino.setText(getString(R.string.coord_destino, formatar(destino)));
+            tvCoordDestino.setVisibility(View.VISIBLE);
+        } else {
+            tvCoordDestino.setVisibility(View.GONE);
+        }
+
+        if (atual != null && destino != null) {
+            linha.setPoints(Arrays.asList(atual, destino));
+            mapView.getOverlays().add(0, linha);
+            double km = calculaDistanciaEmKM(atual.getLatitude(), atual.getLongitude(),
+                    destino.getLatitude(), destino.getLongitude());
+            tvDistancia.setText(getString(R.string.distancia, formatarDistancia(km)));
+            tvDistancia.setVisibility(View.VISIBLE);
+        } else {
+            tvDistancia.setVisibility(View.GONE);
+        }
+
+        enquadrar(atual, destino);
+        mapView.invalidate();
+    }
+
+    /** Ajusta zoom/centro só quando muda o que há para mostrar (não a cada leitura do GPS). */
+    private void enquadrar(GeoPoint atual, GeoPoint destino) {
+        int estado = (atual != null ? 1 : 0) + (destino != null ? 2 : 0);
+        if (estado == 0 || estado == enquadrado) return;
+        enquadrado = estado;
+        if (estado == 3) {
+            BoundingBox caixa = BoundingBox.fromGeoPoints(Arrays.asList(atual, destino));
+            // aguarda o layout do mapa para ter largura/altura válidas
+            mapView.post(() -> {
+                if (atual.distanceToAsDouble(destino) < 50) {
+                    mapView.getController().setZoom(17.0);
+                    mapView.getController().setCenter(destino);
+                } else {
+                    mapView.zoomToBoundingBox(caixa.increaseByScale(1.3f), true, 80);
+                }
+            });
+        } else if (estado == 2) {
+            mapView.getController().animateTo(destino, 16.0, 800L);
+        } else {
+            mapView.getController().animateTo(atual, 15.0, 800L);
+        }
+    }
+
+    public double calculaDistanciaEmKM(double lat1, double lon1, double lat2, double lon2) {
+        Location start = new Location("Start Point");
+        start.setLatitude(lat1);
+        start.setLongitude(lon1);
+        final Location finish = new Location("Finish Point");
+        finish.setLatitude(lat2);
+        finish.setLongitude(lon2);
+        final float distance = start.distanceTo(finish);
+        return distance / 1000;
+    }
+
+    private static String formatar(GeoPoint p) {
+        return String.format(Locale.US, "%.6f, %.6f", p.getLatitude(), p.getLongitude());
+    }
+
+    private static String formatarDistancia(double km) {
+        if (km < 1) return String.format(Locale.getDefault(), "%.0f m", km * 1000);
+        return String.format(Locale.getDefault(), "%.2f km", km);
     }
 
     @Override
     public void onResume() {
-        //ponto adequado para reposicionar o apontador
         super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
     }
 }
