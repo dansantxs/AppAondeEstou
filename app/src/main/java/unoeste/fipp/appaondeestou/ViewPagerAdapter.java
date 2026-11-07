@@ -6,20 +6,18 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
-    public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity)    {
+    public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
     }
+
     @NonNull
     @Override
-    public Fragment createFragment(int position)     {
-        if (position == 0) {
-            return new GpsFragment();
-        }
-        if (position == 1) {
-            return new MapaFragment();
-        }
-        return new CreditosFragment();
+    public Fragment createFragment(int position) {
+        if (position == MainActivity.PAGINA_BUSCA) return new BuscaFragment();
+        if (position == MainActivity.PAGINA_RESULTADOS) return new ResultadosFragment();
+        return new MapaFragment();
     }
+
     @Override
     public int getItemCount() {
         return 3;
