@@ -9,7 +9,6 @@ import retrofit2.http.Query;
 import unoeste.fipp.appaondeestou.model.Cidade;
 import unoeste.fipp.appaondeestou.model.Estado;
 
-/** https://servicodados.ibge.gov.br/api/v1/localidades/ */
 public interface IbgeService {
     @GET("api/v1/localidades/estados")
     Call<List<Estado>> listarEstados();

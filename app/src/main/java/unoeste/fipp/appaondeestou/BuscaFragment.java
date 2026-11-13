@@ -33,7 +33,6 @@ import unoeste.fipp.appaondeestou.model.Cidade;
 import unoeste.fipp.appaondeestou.model.Endereco;
 import unoeste.fipp.appaondeestou.model.Estado;
 
-/** Fragment 1: seleção de UF/cidade e digitação da referência. */
 public class BuscaFragment extends Fragment {
     private static final String UF_PADRAO = "SP";
 
@@ -51,6 +50,7 @@ public class BuscaFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_busca, container, false);
         spUf = view.findViewById(R.id.spUf);
         spCidade = view.findViewById(R.id.spCidade);
@@ -145,7 +145,7 @@ public class BuscaFragment extends Fragment {
             public void onResponse(@NonNull Call<List<Cidade>> call, @NonNull Response<List<Cidade>> response) {
                 if (!ativo()) return;
                 Estado atual = (Estado) spUf.getSelectedItem();
-                if (atual == null || !uf.equals(atual.getSigla())) return; // UF trocada no meio
+                if (atual == null || !uf.equals(atual.getSigla())) return;
                 List<Cidade> cidades = response.body();
                 if (!response.isSuccessful() || cidades == null) {
                     carregando(false, getString(R.string.erro_ibge));

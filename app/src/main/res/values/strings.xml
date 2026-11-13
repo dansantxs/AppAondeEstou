@@ -5,7 +5,6 @@
     <string name="nav_resultados">Resultados</string>
     <string name="nav_mapa">Mapa</string>
 
-    <!-- Busca -->
     <string name="titulo_busca">Encontre um local</string>
     <string name="subtitulo_busca">Escolha a UF e a cidade e informe parte do nome de uma rua, avenida, praça ou estabelecimento.</string>
     <string name="label_uf">UF</string>
@@ -25,7 +24,6 @@
         <item quantity="other">%1$d resultados encontrados.</item>
     </plurals>
 
-    <!-- Resultados -->
     <plurals name="resumo_resultados">
         <item quantity="one">%1$d resultado para %2$s</item>
         <item quantity="other">%1$d resultados para %2$s</item>
@@ -33,7 +31,6 @@
     <string name="sem_resultados">Nenhuma pesquisa ainda.\nUse a aba Buscar.</string>
     <string name="cep_formato">CEP %1$s</string>
 
-    <!-- Mapa -->
     <string name="selecione_resultado">Selecione um resultado na aba Resultados</string>
     <string name="voce_esta_aqui">Você está aqui</string>
     <string name="aguardando_gps">Sua posição: aguardando GPS…</string>

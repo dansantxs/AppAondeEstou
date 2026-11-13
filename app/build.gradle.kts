@@ -4,8 +4,6 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
-// Chave da LocationIQ lida do local.properties (não versionado):
-// LOCATIONIQ_KEY=pk.xxxxxxxx
 val localProps = Properties().apply {
     val arquivo = rootProject.file("local.properties")
     if (arquivo.exists()) arquivo.inputStream().use { load(it) }

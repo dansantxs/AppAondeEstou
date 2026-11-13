@@ -3,7 +3,6 @@ package unoeste.fipp.appaondeestou.api;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-/** Instâncias únicas do Retrofit para cada API utilizada. */
 public final class RetrofitClient {
     private static IbgeService ibge;
     private static ViaCepService viaCep;

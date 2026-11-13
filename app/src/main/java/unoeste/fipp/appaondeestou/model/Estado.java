@@ -1,6 +1,5 @@
 package unoeste.fipp.appaondeestou.model;
 
-/** UF retornada pela API de localidades do IBGE. */
 public class Estado {
     private int id;
     private String sigla;

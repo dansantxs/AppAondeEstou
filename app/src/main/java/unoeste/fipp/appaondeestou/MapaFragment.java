@@ -25,9 +25,7 @@ import java.util.Locale;
 
 import unoeste.fipp.appaondeestou.model.Endereco;
 
-/** Fragment 3: posição atual, posição do endereço e distância em linha reta. */
 public class MapaFragment extends Fragment {
-    // centro usado enquanto não há nenhuma posição (Presidente Prudente/SP)
     private static final GeoPoint CENTRO_PADRAO = new GeoPoint(-22.1256, -51.3889);
 
     private MapView mapView;
@@ -37,12 +35,12 @@ public class MapaFragment extends Fragment {
     private ProgressBar pbGeocodificando;
 
     private AppViewModel viewModel;
-    // o que já foi enquadrado: 0 nada, 1 só atual, 2 só destino, 3 ambos
     private int enquadrado = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_mapa, container, false);
         mapView = view.findViewById(R.id.mapaId);
         tvTitulo = view.findViewById(R.id.tvTitulo);
@@ -55,12 +53,16 @@ public class MapaFragment extends Fragment {
 
         mapView.setTileSource(TileSourceFactory.MAPNIK);
         mapView.setMultiTouchControls(true);
+        //Faz zoom no mapa
         mapView.getController().setZoom(14.0);
+        //Centraliza o mapa no ponto de referência
         mapView.getController().setCenter(CENTRO_PADRAO);
 
+        //Cria um marcador no mapa
         markerAtual = new Marker(mapView);
         markerAtual.setTitle(getString(R.string.voce_esta_aqui));
         markerAtual.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.ic_posicao_atual));
+        //Posição do ícone
         markerAtual.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
 
         markerDestino = new Marker(mapView);
@@ -109,7 +111,6 @@ public class MapaFragment extends Fragment {
         markerDestino.setSnippet(e.getEnderecoCompleto() + " - CEP " + e.getCep());
     }
 
-    /** Reposiciona marcadores, linha e recalcula a distância. */
     private void atualizar() {
         GeoPoint atual = viewModel.getLocalizacaoAtual().getValue();
         GeoPoint destino = viewModel.getDestino().getValue();
@@ -147,14 +148,12 @@ public class MapaFragment extends Fragment {
         mapView.invalidate();
     }
 
-    /** Ajusta zoom/centro só quando muda o que há para mostrar (não a cada leitura do GPS). */
     private void enquadrar(GeoPoint atual, GeoPoint destino) {
         int estado = (atual != null ? 1 : 0) + (destino != null ? 2 : 0);
         if (estado == 0 || estado == enquadrado) return;
         enquadrado = estado;
         if (estado == 3) {
             BoundingBox caixa = BoundingBox.fromGeoPoints(Arrays.asList(atual, destino));
-            // aguarda o layout do mapa para ter largura/altura válidas
             mapView.post(() -> {
                 if (atual.distanceToAsDouble(destino) < 50) {
                     mapView.getController().setZoom(17.0);

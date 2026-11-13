@@ -13,7 +13,6 @@ import java.util.List;
 
 import unoeste.fipp.appaondeestou.model.Endereco;
 
-/** Adapter personalizado do ListView de resultados (layout item_endereco). */
 public class EnderecoAdapter extends ArrayAdapter<Endereco> {
     private final LayoutInflater inflater;
 

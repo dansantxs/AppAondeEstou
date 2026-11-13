@@ -17,10 +17,6 @@ import unoeste.fipp.appaondeestou.api.RetrofitClient;
 import unoeste.fipp.appaondeestou.model.Endereco;
 import unoeste.fipp.appaondeestou.model.LocationIqResult;
 
-/**
- * Dados compartilhados entre os 3 fragments (vive enquanto a Activity existir,
- * inclusive em rotações de tela).
- */
 public class AppViewModel extends ViewModel {
     private final MutableLiveData<List<Endereco>> resultados = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<String> descricaoBusca = new MutableLiveData<>("");
@@ -39,7 +35,7 @@ public class AppViewModel extends ViewModel {
     public LiveData<String> getErroGeocodificacao() { return erroGeocodificacao; }
 
     public void setResultados(List<Endereco> lista, String descricao) {
-        descricaoBusca.setValue(descricao); // antes da lista: o observer da lista lê a descrição
+        descricaoBusca.setValue(descricao);
         resultados.setValue(lista);
     }
 
@@ -47,7 +43,6 @@ public class AppViewModel extends ViewModel {
         localizacaoAtual.setValue(ponto);
     }
 
-    /** Seleciona um resultado e busca suas coordenadas na LocationIQ. */
     public void selecionar(@NonNull Endereco endereco) {
         selecionado.setValue(endereco);
         destino.setValue(null);
@@ -69,7 +64,7 @@ public class AppViewModel extends ViewModel {
                     @Override
                     public void onResponse(@NonNull Call<List<LocationIqResult>> call,
                                            @NonNull Response<List<LocationIqResult>> response) {
-                        if (endereco != selecionado.getValue()) return; // seleção mudou
+                        if (endereco != selecionado.getValue()) return;
                         if (!aplicarResultado(response)) buscarPorCep(key, endereco);
                     }
 
@@ -81,7 +76,6 @@ public class AppViewModel extends ViewModel {
                 });
     }
 
-    /** Alternativa: geocodifica apenas pelo CEP quando o logradouro não é encontrado. */
     private void buscarPorCep(String key, Endereco endereco) {
         RetrofitClient.locationIq()
                 .buscarPorCep(key, endereco.getCep(), "br", "json", 1)

@@ -2,7 +2,6 @@ package unoeste.fipp.appaondeestou.model;
 
 import java.io.Serializable;
 
-/** Endereço retornado pela busca do ViaCEP. */
 public class Endereco implements Serializable {
     private String cep;
     private String logradouro;
@@ -32,7 +31,6 @@ public class Endereco implements Serializable {
         return localidade + "/" + uf;
     }
 
-    /** Ex.: "Avenida Brasil, Vila Furquim, Presidente Prudente/SP" */
     public String getEnderecoCompleto() {
         StringBuilder sb = new StringBuilder(logradouro);
         if (bairro != null && !bairro.isEmpty()) sb.append(", ").append(bairro);

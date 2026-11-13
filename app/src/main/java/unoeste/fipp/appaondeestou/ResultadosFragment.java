@@ -14,12 +14,12 @@ import java.util.ArrayList;
 
 import unoeste.fipp.appaondeestou.model.Endereco;
 
-/** Fragment 2: resultados da pesquisa em um ListView personalizado. */
 public class ResultadosFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_resultados, container, false);
         TextView tvResumo = view.findViewById(R.id.tvResumo);
         ListView lvResultados = view.findViewById(R.id.lvResultados);

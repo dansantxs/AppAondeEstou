@@ -1,6 +1,5 @@
 package unoeste.fipp.appaondeestou.model;
 
-/** Município retornado pela API de localidades do IBGE. */
 public class Cidade {
     private int id;
     private String nome;
