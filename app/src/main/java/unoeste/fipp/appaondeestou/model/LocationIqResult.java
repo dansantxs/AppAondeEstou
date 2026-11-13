@@ -2,7 +2,6 @@ package unoeste.fipp.appaondeestou.model;
 
 import com.google.gson.annotations.SerializedName;
 
-/** Item retornado pela busca (forward geocoding) da LocationIQ. */
 public class LocationIqResult {
     private String lat;
     private String lon;

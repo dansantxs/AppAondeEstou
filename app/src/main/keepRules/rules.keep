@@ -10,5 +10,4 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
-# Modelos desserializados pelo Gson (Retrofit) - mantém nomes dos campos
 -keep class unoeste.fipp.appaondeestou.model.** { *; }

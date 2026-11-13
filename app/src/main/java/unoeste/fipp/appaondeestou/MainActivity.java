@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // configuração do osmdroid antes de inflar qualquer MapView
+        // necessário para API superior à 13
         Configuration.getInstance().load(this, getSharedPreferences("osmdroid", Context.MODE_PRIVATE));
         Configuration.getInstance().setUserAgentValue(getPackageName());
 
@@ -62,10 +62,11 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager = findViewById(R.id.viewPager);
         bottomNavigation = findViewById(R.id.bottomNavigation);
+        // instanciando o adapter para o viewPager
         viewPager.setAdapter(new ViewPagerAdapter(this));
         viewPager.setOffscreenPageLimit(2);
 
-        // navegando entre os fragments pela barra inferior
+        //navegando entre os fragments
         bottomNavigation.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_busca) { viewPager.setCurrentItem(PAGINA_BUSCA); return true; }
@@ -73,14 +74,13 @@ public class MainActivity extends AppCompatActivity {
             if (id == R.id.nav_mapa) { viewPager.setCurrentItem(PAGINA_MAPA); return true; }
             return false;
         });
-        // sincronizando a barra inferior com o deslizar das páginas
+        //selecionando os buttons correspondentes
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
                 if (position == PAGINA_BUSCA) bottomNavigation.setSelectedItemId(R.id.nav_busca);
                 else if (position == PAGINA_RESULTADOS) bottomNavigation.setSelectedItemId(R.id.nav_resultados);
                 else bottomNavigation.setSelectedItemId(R.id.nav_mapa);
-                // no mapa o arrasto horizontal move o mapa, não troca de página
                 viewPager.setUserInputEnabled(position != PAGINA_MAPA);
             }
         });
@@ -128,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
                 if (ultima != null && viewModel.getLocalizacaoAtual().getValue() == null)
                     locationListener.onLocationChanged(ultima);
             } catch (SecurityException | IllegalArgumentException e) {
-                // GPS exige localização precisa; com permissão aproximada usa só a rede
             }
         }
     }
